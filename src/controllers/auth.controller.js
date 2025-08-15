@@ -49,29 +49,27 @@ async function postLoginController(req, res) {
     const user = await userModel.findOne({
         $or: [
             { email: email },
-            {username : email}
+            { username: email }
         ]
     })
 
-    if(!user){
+    if (!user) {
         return res.redirect('/login?error=User not found')
     }
 
-    const isPasswordValid = await bcrypt.compare(password,user.password)
-    if(!isPasswordValid){
-        return res.status(400).json({
-            msg: "Invalid password"
-        })
+    const isPasswordValid = await bcrypt.compare(password, user.password)
+    if (!isPasswordValid) {
+        return res.redirect('/login?error=Invalid Password');
     }
 
     const token = jwt.sign({
-        id:user._id
-    },process.env.JWT_SECRET);
-    res.cookie('token',token);
+        id: user._id
+    }, process.env.JWT_SECRET);
+    res.cookie('token', token);
 
     return res.status(200).json({
         msg: "Logged in successfully",
-        user:{
+        user: {
             username: user.username,
             id: user._id
         }
