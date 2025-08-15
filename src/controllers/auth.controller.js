@@ -33,10 +33,7 @@ async function postRegisterController(req, res) {
     }, process.env.JWT_SECRET);
     res.cookie('token', token);
 
-    return res.status(201).json({
-        msg: "user created successfully",
-        user: user
-    })
+    return res.status(201).redirect('/')
 }
 
 async function getLoginController(req, res) {
@@ -54,12 +51,12 @@ async function postLoginController(req, res) {
     })
 
     if (!user) {
-        return res.redirect('/login?error=User not found')
+        return res.redirect('/auth/login?error=User not found')
     }
 
     const isPasswordValid = await bcrypt.compare(password, user.password)
     if (!isPasswordValid) {
-        return res.redirect('/login?error=Invalid Password');
+        return res.redirect('/auth/login?error=Invalid Password');
     }
 
     const token = jwt.sign({
@@ -67,18 +64,18 @@ async function postLoginController(req, res) {
     }, process.env.JWT_SECRET);
     res.cookie('token', token);
 
-    return res.status(200).json({
-        msg: "Logged in successfully",
-        user: {
-            username: user.username,
-            id: user._id
-        }
-    })
+    return res.status(200).redirect('/')
+}
+
+async function userLogout(req, res){
+    res.clearCookie('token');
+    return res.redirect('/auth/login');
 }
 
 module.exports = {
     getRegisterController,
     postRegisterController,
     getLoginController,
-    postLoginController
+    postLoginController,
+    userLogout
 }
