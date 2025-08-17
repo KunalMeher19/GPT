@@ -108,6 +108,6 @@
         })
 
         list.appendChild(messageItem);
-
+        scrollToBottom();
     })
 })();
